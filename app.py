@@ -6,7 +6,7 @@ import pickle
 
 
 
-model = load_model("./pickle/model.h5") 
+model = load_model("./model/model.h5")
 
 with open('./pickle/scaler_F.pkl', 'rb') as f1:
    scaler_F = pickle.load(f1)
