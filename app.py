@@ -4,47 +4,48 @@ from tensorflow.keras.models import load_model  # TensorFlow's Keras
 import pickle
 
 
-model = load_model("./pickle/battery_life_model.h5") 
 
-with open('./pickle/scaler.pkl', 'rb') as scaler_file:
-   scaler= pickle.load(scaler_file)
 
-with open('./pickle/onehot_encoder.pkl', 'rb') as encode_file:
-    onehot_encoder = pickle.load(encode_file)
+model = load_model("./pickle/model.h5") 
 
+with open('./pickle/scaler_F.pkl', 'rb') as f1:
+   scaler_F= pickle.load(f1)
+   
+with open('./pickle/scaler_y.pkl', 'rb') as f2:
+   scaler_y= pickle.load(f2)
+
+with open('./pickle/onehot_encoder.pkl', 'rb') as f3:
+    onehot_encoder = pickle.load(f3)
 
 def prepare_input(type, Capacity, Re, Rct):
-    #encode "type"
-    type_encoded = onehot_encoder.transform([[type]])  #mảng 2D
+    # encode "type"
+    type_encoded = onehot_encoder.transform(np.array([[type]]))  # array 2D (1, 3)
 
-    # vector đặc trưng đầu vào 
-    F_input = np.concatenate((np.array([[Capacity, Re, Rct]]), type_encoded),axis=1)
-    print("Input shape:", F_input.shape)
+    F_predict = np.concatenate((np.array([[Capacity, Re, Rct]]), type_encoded),axis=1)
+    print("Input shape:", F_predict.shape) # 2D (1, 6)
 
-    # chuẩn hóa đặc trưng đầu vào
-    F_input_scaled = scaler.transform(F_input) #mảng 2D
-
-    return F_input_scaled
+    # scaling
+    F_predict = scaler_F.transform(F_predict) # 2D (1, 6)
+    
+    return F_predict
 
 def predict_battery_life(**predict_input):
-    F_input_scaled = prepare_input(**predict_input)
+    F_predict = prepare_input(**predict_input)
 
     # đầu ra dự đoán (ambient_temperature)
-    y_predicted = model.predict(F_input_scaled)
+    y_predict = model.predict(F_predict)
 
-    return y_predicted[0]
-
-
+    return scaler_y.inverse_transform(y_predict)[0][0]
 
 st.title("Battery Life Prediction using ANN")
 
 # Input fields
 type = st.selectbox("Select Discharge Type", ['charge', 'discharge', 'impedance'])
-Capacity = st.number_input("Enter Capacity", min_value=0.0)
-Re = st.number_input("Enter Re", min_value=-1e12, max_value=1e12)
-Rct = st.number_input("Enter Rct", min_value=-1e12, max_value=1e12)
+Capacity = st.number_input("Enter Capacity", min_value=0.0, format="%.8f")
+Re = st.number_input("Enter Re", min_value=-1e12, max_value=1e12, format="%.8f")
+Rct = st.number_input("Enter Rct", min_value=-1e12, max_value=1e12, format="%.8f")
 
 # Button
 if st.button('Predict Battery Life'):
     predicted_battery_life = predict_battery_life(type=type, Capacity=Capacity, Re=Re, Rct=Rct)
-    st.write(f"The predicted battery life is: {predicted_battery_life} units")
+    st.write(f"The predicted battery life is: {predicted_battery_life:.2f} units")
