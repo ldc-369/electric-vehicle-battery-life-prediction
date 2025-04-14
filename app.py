@@ -8,13 +8,13 @@ import pickle
 
 model = load_model("./model/model.h5")
 
-with open('./pickle/scaler_F.pkl', 'rb') as f1:
+with open('./model/scaler_F.pkl', 'rb') as f1:
    scaler_F = pickle.load(f1)
    
-with open('./pickle/scaler_y.pkl', 'rb') as f2:
+with open('./model/scaler_y.pkl', 'rb') as f2:
    scaler_y = pickle.load(f2)
 
-with open('./pickle/onehot_encoder.pkl', 'rb') as f3:
+with open('./model/onehot_encoder.pkl', 'rb') as f3:
     onehot_encoder = pickle.load(f3)
 
 def prepare_input(type, Capacity, Re, Rct):
