@@ -15,13 +15,13 @@ with open('./model/type_encoder.pkl', 'rb') as f3:
     type_encoder = pickle.load(f3)
 
 def prepare_input(input):
-    capacity = input[0]['Capacity']
-    re = input[0]['Re']
-    rct = input[0]['Rct']
-    
     X_predict = np.empty((0, 6), float)
     
     for item in input:
+        capacity = item['Capacity']
+        re = item['Re']
+        rct = item['Rct']
+        
         # encode
         type_encoded = type_encoder.transform(np.array([[item['Type'].lower()]])) # # array(1, 3)
 
