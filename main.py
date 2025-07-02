@@ -1,5 +1,5 @@
 import numpy as np
-from tensorflow.keras.models import load_model  # TensorFlow's Keras
+from tensorflow.keras.models import load_model
 import pickle
 
 # load model
@@ -15,15 +15,18 @@ with open('./model/type_encoder.pkl', 'rb') as f3:
     type_encoder = pickle.load(f3)
 
 def prepare_input(input):
-    # encode
-    type_encoded = type_encoder.transform(np.array([[input['Type'].lower()]])) # # array(1, 3)
+    X_predict = np.zeros(6).reshape(1, 6)
     
-    # scale
-    X_remain = np.array([[input['Capacity'], input['Re'], input['Rct']]]) # array(1, 3)
-    X_remain = X_scaler.transform(X_remain)
+    for item in input:
+        # encode
+        type_encoded = type_encoder.transform(np.array([[item['Type'].lower()]])) # # array(1, 3)
 
-    #concatenate
-    X_predict = np.concatenate((type_encoded, X_remain), axis=1)  # array(1, 6)
+        # scale
+        X_remain = np.array([[item['Capacity'], item['Re'], item['Rct']]]) # array(1, 3)
+        X_remain = X_scaler.transform(X_remain)
+
+        #concatenate
+        X_predict = np.concatenate((X_predict, np.concatenate((type_encoded, X_remain), axis=1)), axis=0)  # array(1, 6)
 
     return X_predict
 
@@ -34,12 +37,15 @@ def predict_battery_life(input):
 
     return Y_scaler.inverse_transform(Y_predict)
 
-input = {
-    "Type": 'discharge', 
-    "Capacity": 0.990759, 
-    "Re": 0.072553, 
-    "Rct": 0.101419
-}
+input = [
+    {
+        "Type": 'discharge', 
+        "Capacity": 0.990759, 
+        "Re": 0.072553, 
+        "Rct": 0.101419,
+        # "ambient_temperature": 4
+    }
+]
 
 Y_predict = predict_battery_life(input)
 
