@@ -15,7 +15,7 @@ with open('./model/type_encoder.pkl', 'rb') as f3:
     type_encoder = pickle.load(f3)
 
 def prepare_input(input):
-    X_predict = np.empty((0, 6), float)
+    X_predict = np.empty((0, 6))
     
     for item in input:
         capacity = item['Capacity']
@@ -30,13 +30,12 @@ def prepare_input(input):
         X_remain = X_scaler.transform(X_remain)
 
         #concatenate
-        X_predict = np.concatenate((X_predict, np.concatenate((type_encoded, X_remain), axis=1)), axis=0)  # array(1, 6)
+        X_predict = np.concatenate((X_predict, np.concatenate((type_encoded, X_remain), axis=1)), axis=0)  # array(-1, 6)
 
     return X_predict
 
 def predict_battery_life(input):
     X_predict = prepare_input(input)
-    
     Y_predict = model.predict(X_predict)
 
     return Y_scaler.inverse_transform(Y_predict)
@@ -52,5 +51,4 @@ input = [
 ]
 
 Y_predict = predict_battery_life(input)
-
 print(f"Predicted ambient_temperature: {Y_predict}")
