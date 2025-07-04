@@ -34,10 +34,8 @@ def prepare_input(input):
 
     return X_predict
 
-def predict_battery_life(input):
-    X_predict = prepare_input(input)
+def predict_battery_life(X_predict):
     Y_predict = model.predict(X_predict)
-
     return Y_scaler.inverse_transform(Y_predict)
 
 input = [
@@ -50,5 +48,6 @@ input = [
     }
 ]
 
-Y_predict = predict_battery_life(input)
+X_predict = prepare_input(input)
+Y_predict = predict_battery_life(X_predict)
 print(f"Predicted ambient_temperature: {Y_predict}")
