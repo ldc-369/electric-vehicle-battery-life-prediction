@@ -30,9 +30,8 @@ def prepare_input(input):
         X_remain = X_scaler.transform(X_remain)
 
         #concatenate
-        X_predict = np.concatenate((X_predict, np.concatenate((type_encoded, X_remain), axis=1)), axis=0)  # array(-1, 6)
+        X_predict = np.concatenate((X_predict, np.concatenate((type_encoded, X_remain), axis=1)), axis=0)[1:]  # array(-1, 6)
        
-    X_predict = X_predict[1:]
     return X_predict
 
 def predict_battery_life(X_predict):
